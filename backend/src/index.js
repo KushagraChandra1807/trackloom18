@@ -43,6 +43,12 @@ app.use(cors({
 app.use(express.json());
 app.use(clerkMiddleware());
 
+app.use((req, res, next) => {
+    console.log("🔒 Clerk auth debug:", req.auth);
+    next();
+});
+
+
 app.use(fileUpload({
     useTempFiles: true,
     tempFileDir: path.join(__dirname, "tmp"),

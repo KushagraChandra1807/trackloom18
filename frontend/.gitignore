@@ -7,9 +7,12 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependency directories
 node_modules
-dist
-dist-ssr
+
+# Ignore only root-level dist, not nested like frontend/dist
+/dist
+/dist-ssr
 *.local
 
 # Editor directories and files

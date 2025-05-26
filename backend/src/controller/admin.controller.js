@@ -4,6 +4,7 @@ dotenv.config(); // Ensure environment variables are loaded first
 import { Song } from "../models/song.model.js";
 import { Album } from "../models/album.model.js";
 import { v2 as cloudinary } from "cloudinary";
+import { clerkClient } from "@clerk/clerk-sdk-node"; // ✅ Added for admin email check
 
 console.log("Cloudinary Key:", process.env.CLOUDINARY_API_KEY);
 
@@ -129,6 +130,22 @@ export const deleteAlbum = async (req, res, next) => {
   }
 };
 
+// ✅ NEW VERSION — Checks actual email from Clerk
+export const checkAdmin = async (req, res, next) => {
+  try {
+    const user = await clerkClient.users.getUser(req.auth.userId);
+    const isAdmin = user.primaryEmailAddress?.emailAddress === process.env.ADMIN_EMAIL;
+
+    return res.status(200).json({ admin: isAdmin });
+  } catch (error) {
+    console.error("❌ Error in checkAdmin:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+/*
+// 🔙 OLD checkAdmin — now commented for reference
 export const checkAdmin = async (req, res, next) => {
   res.status(200).json({ admin: true });
 };
+*/

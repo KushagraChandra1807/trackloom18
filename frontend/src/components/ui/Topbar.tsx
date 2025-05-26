@@ -1,3 +1,4 @@
+import { useEffect } from "react"; // ✅ Added for useEffect
 import { SignedOut, UserButton } from "@clerk/clerk-react";
 import { LayoutDashboardIcon } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -7,14 +8,21 @@ import { buttonVariants } from "./button";
 import { cn } from "@/lib/utils";
 
 const Topbar = () => {
-    const  {isAdmin} = useAuthStore();
-    console.log({isAdmin});
+    // const  {isAdmin} = useAuthStore(); // ❌ original line
+    const { isAdmin, checkAdminStatus } = useAuthStore(); // ✅ updated line to include checkAdminStatus
+
+    useEffect(() => {
+        checkAdminStatus(); // ✅ call admin check on component mount
+    }, [checkAdminStatus]);
+
+    console.log({ isAdmin });
+
     return (
         <div className="flex items-center justify-between p-4 sticky top-0 bg-zinc-900/75
         backdrop-blur-md z-10">
             <div className="flex gap-2 items-center">
-            <img src="/trackloom.png" className="size-8" alt="Spotify logo"/>
-            Trackloom    
+                <img src="/trackloom.png" className="size-8" alt="Spotify logo" />
+                Trackloom    
             </div>
             <div className="flex items-center gap-4">
                 {
@@ -38,7 +46,7 @@ const Topbar = () => {
 
             </div>
         </div>
-    )
+    );
 }
 
-export default Topbar
+export default Topbar;

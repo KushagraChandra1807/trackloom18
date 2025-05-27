@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuth } from "@clerk/clerk-react";
+import { useAuth, useUser } from "@clerk/clerk-react"; // ✅ useUser added
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useMusicStore } from "@/stores/useMusicStore";
 import Header from "./components/Header";
@@ -11,8 +11,16 @@ import AlbumsTabContent from "./components/AlbumsTabContent";
 
 const AdminPage = () => {
   const { isLoaded, getToken } = useAuth();
+  const { user, isSignedIn } = useUser(); // ✅ useUser added
+
   const { isAdmin, isLoading, checkAdminStatusWithToken } = useAuthStore();
   const { fetchAlbums, fetchSongs, fetchStats } = useMusicStore();
+
+  // ✅ Debug logs
+  useEffect(() => {
+    console.log("🔐 isSignedIn:", isSignedIn);
+    console.log("👤 user:", user);
+  }, [isSignedIn, user]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -20,7 +28,7 @@ const AdminPage = () => {
 
       const token = await getToken();
       if (!token) {
-        // No token, stop here
+        console.warn("❌ No Clerk token found");
         return;
       }
 
@@ -41,7 +49,7 @@ const AdminPage = () => {
   if (!isAdmin && !isLoading) return <div>Unauthorized</div>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from zinc-900 via-zinc-900 to-black text-zinc-100 p-8">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-900 via-zinc-900 to-black text-zinc-100 p-8">
       <Header />
 
       <DashboardStats />

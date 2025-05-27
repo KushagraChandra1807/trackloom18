@@ -23,28 +23,34 @@ const AdminPage = () => {
   }, [isSignedIn, user]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (!isLoaded) return; // Wait for auth to load
+  const fetchData = async () => {
+    if (!isLoaded) return;
 
-      const token = await getToken();
-      if (!token) {
-        console.warn("❌ No Clerk token found");
-        return;
-      }
+    const token = await getToken();
+    if (!token) {
+      console.warn("❌ No Clerk token found");
+      return;
+    }
 
-      await checkAdminStatusWithToken(token);
+    // Manually check admin status
+    await checkAdminStatusWithToken(token);
 
-      if (!isAdmin) return;
+    // ❗ Re-read Zustand state after awaiting the above
+    const latestState = useAuthStore.getState();
+    if (!latestState.isAdmin) {
+      console.warn("🚫 Not an admin");
+      return;
+    }
 
-      await Promise.all([
-        fetchAlbums(token),
-        fetchSongs(token),
-        fetchStats(token),
-      ]);
-    };
+    await Promise.all([
+      fetchAlbums(token),
+      fetchSongs(token),
+      fetchStats(token),
+    ]);
+  };
 
-    fetchData();
-  }, [isLoaded, getToken, checkAdminStatusWithToken, fetchAlbums, fetchSongs, fetchStats, isAdmin]);
+  fetchData();
+}, [isLoaded, getToken, checkAdminStatusWithToken, fetchAlbums, fetchSongs, fetchStats]);
 
   if (!isAdmin && !isLoading) return <div>Unauthorized</div>;
 
